@@ -50,12 +50,14 @@ class MainApp(App):
         self.description_input = TextInput(hint_text="Описание", multiline=False)
         self.layout.add_widget(self.description_input)
 
+        # Кнопки даты
+
         # Кнопка Выбор дня
         self.day_spinner = Spinner(
             text=self.selected_date[8:10], # Вставляем текущий день
             values=[str(i) for i in range(1, 32)],  # Дни от 1 до 31
             size_hint=(None, None),
-            size=(100, 44),
+            size=(120, 30),
             pos_hint={'center_x': 0.5}
         )
         self.selected_date.strip()
@@ -63,9 +65,8 @@ class MainApp(App):
         self.month_spinner = Spinner(
             text=self.selected_date[5:7], # Вставляем текущий месяц
             values=[str(i) for i in range(1, 13)],  # Месяцы от 1 до 12
-            # values=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
             size_hint=(None, None),
-            size=(100, 44),
+            size=(120, 30),
             pos_hint={'center_x': 0.5}
         )
 
@@ -74,7 +75,7 @@ class MainApp(App):
             text=self.selected_date[0:4], # Вставляем текущий год
             values=[str(i) for i in range(2020, 2100)],  # Годы от 2020 до 2099
             size_hint=(None, None),
-            size=(100, 44),
+            size=(120, 30),
             pos_hint={'center_x': 0.5}
         )
 
@@ -82,11 +83,11 @@ class MainApp(App):
         confirm_button = Button(
             text='Подтвердить',
             size_hint=(None, None),
-            size=(150, 44),
+            size=(120, 30),
             pos_hint={'center_x': 0.5}
         )
 
-        # confirm_button.bind(on_press=self.on_confirm)
+        confirm_button.bind(on_press=self.on_confirm)
 
         # Добавляем виджеты в макет
         self.layout.add_widget(Label(size_hint=(None, None), size=(150, 44)))
@@ -95,7 +96,7 @@ class MainApp(App):
         self.layout.add_widget(self.year_spinner)
         self.layout.add_widget(confirm_button)
 
-        self.selected_date = (f"{self.year_spinner}-{self.month_spinner}-{self.day_spinner}")
+        self.selected_date = (f"{self.year_spinner.text}-{self.month_spinner.text}-{self.day_spinner.text}")
         print(type(self.selected_date), self.selected_date)
 
         # Кнопки для времени
@@ -137,7 +138,7 @@ class MainApp(App):
 
         return self.layout
 # ***************************************************************************
-    def show_date_picker(self, instance):
+#     def show_date_picker(self, instance):
 #         """Отображение DatePicker для выбора даты."""
 #         content = BoxLayout(orientation="vertical", padding=10, spacing=10)
 #         date_picker = DatePicker(date=datetime.strptime(self.selected_date, "%Y-%m-%d"))
@@ -166,11 +167,13 @@ class MainApp(App):
         #
         # return layout
 
-        def on_confirm(self, instance):
-            # Получаем выбранные значения
-            day = self.day_spinner.text
-            month = self.month_spinner.text
-            year = self.year_spinner.text
+    def on_confirm(self, instance):
+        # Получаем выбранные значения
+        self.selected_date = (f"{self.year_spinner.text}-{self.month_spinner.text}-{self.day_spinner.text}")
+        print(type(self.selected_date), self.selected_date)
+        # day = self.day_spinner.text
+        # month = self.month_spinner.text
+        # year = self.year_spinner.text
 
 
 

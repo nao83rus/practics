@@ -7,16 +7,16 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.popup import Popup
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.datepicker import DatePicker
+# from kivy.uix.datepicker import DatePicker
 from datetime import datetime, timedelta
 import os
 
 class Note:
-    def __init__(self, date, start_time, end_time, description, work_time):
+    def __init__(self, date, description, start_time, end_time, work_time):
         self.date = date
+        self.description = description
         self.start_time = start_time
         self.end_time = end_time
-        self.description = description
         self.work_time = work_time
 
 class MainApp(App):
@@ -51,9 +51,11 @@ class MainApp(App):
         self.layout.add_widget(self.description_input)
 
         # Кнопка для выбора даты
-        self.date_button = Button(text=f"Выбрать дату: {self.selected_date}")
-        self.date_button.bind(on_press=self.show_date_picker)
-        self.layout.add_widget(self.date_button)
+        # self.date_button = Button(text=f"Выбрать дату: {self.selected_date}")
+        # self.date_button.bind(on_press=self.show_date_picker)
+        # self.layout.add_widget(self.date_button)
+        self.selected_date = TextInput(hint_text=f"{self.selected_date}", multiline=False)
+        self.layout.add_widget(self.selected_date)
 
         # Кнопки для времени
         self.time_buttons = BoxLayout(size_hint_y=None, height=50)
@@ -74,7 +76,7 @@ class MainApp(App):
         self.layout.add_widget(self.time_labels)
 
         # Кнопка для добавления заметки
-        self.add_note_button = Button(text="Добавить заметку")
+        self.add_note_button = Button(text="Добавить работу")
         self.add_note_button.bind(on_press=self.add_note)
         self.layout.add_widget(self.add_note_button)
 
@@ -94,24 +96,25 @@ class MainApp(App):
 
         return self.layout
 
+    #################################
     def show_date_picker(self, instance):
         """Отображение DatePicker для выбора даты."""
         content = BoxLayout(orientation="vertical", padding=10, spacing=10)
-        date_picker = DatePicker(date=datetime.strptime(self.selected_date, "%Y-%m-%d"))
-        save_button = Button(text="Выбрать")
-        popup = Popup(title="Выберите дату", size_hint=(0.8, 0.8))
+        # date_picker = DatePicker(date=datetime.strptime(self.selected_date, "%Y-%m-%d"))
+        # save_button = Button(text="Выбрать")
+        # popup = Popup(title="Выберите дату", size_hint=(0.8, 0.8))
 
         def save(instance):
-            self.selected_date = date_picker.date.strftime("%Y-%m-%d")
-            self.date_button.text = f"Выбрать дату: {self.selected_date}"
-            popup.dismiss()
+            self.selected_date = date.strftime("%Y-%m-%d")
+            # self.date_button.text = f"Выбрать дату: {self.selected_date}"
+            # popup.dismiss() # метод ручного закрытия всплывающего окна
 
-        save_button.bind(on_press=save)
-        content.add_widget(date_picker)
-        content.add_widget(save_button)
-        popup.content = content
-        popup.open()
-
+        # save_button.bind(on_press=save)
+        # content.add_widget(date_picker)
+        # content.add_widget(save_button)
+        # popup.content = content
+        # popup.open()
+#################################
     def select_technique(self, spinner, text):
         """Выбор техники."""
         self.current_technique = text
@@ -166,16 +169,16 @@ class MainApp(App):
             end = datetime.strptime(self.end_time, "%H:%M")
             delta = end - start
             minutes = delta.seconds // 60
-            if delta.seconds % 60 != 0:
+            if delta.seconds % 60 != 0 or minutes == 0:
                 minutes += 1  # Округление в большую сторону
             work_time = timedelta(minutes=minutes)
 
             # Создание заметки
             note = Note(
                 date=self.selected_date,
+                description=self.description_input.text,
                 start_time=self.start_time,
                 end_time=self.end_time,
-                description=self.description_input.text,
                 work_time=work_time
             )
 
@@ -246,7 +249,7 @@ class MainApp(App):
             filename = f"{self.current_technique}.txt"
             with open(filename, "w", encoding="utf-8") as file:
                 for note in self.notes[self.current_technique]:
-                    file.write(f"{note.date}|{note.start_time}|{note.end_time}|{note.description}|{note.work_time.seconds}\n")
+                    file.write(f"{note.date}|{note.description}|{note.start_time}|{note.end_time}|{note.work_time.seconds}\n")
 
     def load_notes(self):
         """Загрузка заметок из файла."""
@@ -256,9 +259,9 @@ class MainApp(App):
                 with open(filename, "r", encoding="utf-8") as file:
                     self.notes[technique] = []
                     for line in file:
-                        date, start_time, end_time, description, work_time_seconds = line.strip().split("|")
+                        date, description, start_time, end_time, work_time_seconds = line.strip().split("|")
                         work_time = timedelta(seconds=int(work_time_seconds))
-                        self.notes[technique].append(Note(date, start_time, end_time, description, work_time))
+                        self.notes[technique].append(Note(date, description, start_time, end_time, work_time))
 
     def save_techniques(self):
         """Сохранение списка техники в файл."""

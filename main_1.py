@@ -75,7 +75,7 @@ class NoteApp(App):
         self.end_time = datetime.now()
         worked_time = self.end_time - self.start_time
         worked_time_rounded = self.round_up_to_minute(worked_time)
-        self.worked_time_label.text = f"Отработанное время: {worked_time_rounded}"
+        self.worked_time_label.text = f"{worked_time_rounded}"
         self.show_popup("Время окончания", self.end_time.strftime('%H:%M:%S'))
 
     def round_up_to_minute(self, timedelta_obj):
@@ -106,7 +106,7 @@ class NoteApp(App):
         self.notes_grid.clear_widgets()
         for i, note in enumerate(self.notes):
             note_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=40)
-            note_text = f"{note['Дата']} - {note['Описание']} ({note['Отработанное время']})"
+            note_text = f"{note['Дата']} - {note['Описание']} - {note['Отработанное время']}"
             note_label = Label(text=note_text, size_hint_x=0.8)
             delete_button = Button(text="Удалить", size_hint_x=0.2)
             delete_button.bind(on_press=lambda btn, idx=i: self.delete_note(idx))
