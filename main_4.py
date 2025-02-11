@@ -58,7 +58,7 @@ class MainApp(App):
         # Поле для описания
         self.description_input = TextInput(
             size_hint=(1, None),  # 80% ширины родителя
-            height=50,  # Фиксированная высота 100px
+            height=120,  # Фиксированная высота 100px
             hint_text="Введите описание"
             )
         self.layout.add_widget(self.description_input)
@@ -70,7 +70,7 @@ class MainApp(App):
             text=self.selected_date[8:10], # Вставляем текущий день
             values=[str(i) for i in range(1, 32)],  # Дни от 1 до 31
             size_hint=(None, None),
-            size=(100, 70),
+            size=(120, 100),
             pos_hint={'center_x': 0.5}
         )
         self.selected_date.strip()
@@ -79,7 +79,7 @@ class MainApp(App):
             text=self.selected_date[5:7], # Вставляем текущий месяц
             values=[str(i) for i in range(1, 13)],  # Месяцы от 1 до 12
             size_hint=(None, None),
-            size=(100, 70),
+            size=(120, 100),
             pos_hint={'center_x': 0.5}
         )
 
@@ -88,7 +88,7 @@ class MainApp(App):
             text=self.selected_date[0:4], # Вставляем текущий год
             values=[str(i) for i in range(2020, 2100)],  # Годы от 2020 до 2099
             size_hint=(None, None),
-            size=(100, 70),
+            size=(120, 100),
             pos_hint={'center_x': 0.5}
         )
 
@@ -96,13 +96,13 @@ class MainApp(App):
         confirm_button = Button(
             text='Ok',
             size_hint=(None, None),
-            size=(100, 70),
+            size=(150, 100),
             pos_hint={'center_x': 0.5}
         )
         confirm_button.bind(on_press=self.on_confirm)
 
         # Добавляем виджеты в макет
-        self.date_buttons = BoxLayout(size_hint_y=None, height=70)
+        self.date_buttons = BoxLayout(size_hint_y=None, height=100)
         # self.date_buttons.add_widget(button_close)
         self.date_buttons.add_widget(self.day_spinner)
         self.date_buttons.add_widget(self.month_spinner)
@@ -129,7 +129,7 @@ class MainApp(App):
         self.layout.add_widget(self.time_labels)
 
         # Кнопка для добавления заметки
-        self.add_note_button = Button(text="Добавить заметку", size_hint_y=None, height=100)
+        self.add_note_button = Button(text="Добавить заметку", size_hint_y=None, height=120)
         self.add_note_button.bind(on_press=self.add_note)
         self.layout.add_widget(self.add_note_button)
 
