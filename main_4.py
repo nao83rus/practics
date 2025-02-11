@@ -30,12 +30,6 @@ class MainApp(App):
         # Основной интерфейс
         self.layout = BoxLayout(orientation="vertical", padding=10, spacing=10)
 
-        # Кнопки закрытия и выбора техники
-        self.close_tech_buttons = BoxLayout(size_hint_y=None, height=100)
-        self.button_close = Button(text = "Close", height = 100)
-        self.button_close.bind(on_press=self.stop)
-        self.close_tech_buttons.add_widget(self.button_close)
-
         # Выбор техники
         self.technique_spinner = Spinner(
             text="Выберите технику",
@@ -50,8 +44,13 @@ class MainApp(App):
         self.technique_buttons = BoxLayout(size_hint_y=None, height=100)
         self.add_technique_button = Button(text="Добавить технику")
         self.add_technique_button.bind(on_press=self.add_technique)
-        self.delete_technique_button = Button(text="Удалить технику")
-        self.delete_technique_button.bind(on_press=self.delete_technique)
+
+        # Поставили кнопку закрытия вместо удаления техники
+        # self.delete_technique_button = Button(text="Удалить технику")
+        # self.delete_technique_button.bind(on_press=self.delete_technique)
+        self.delete_technique_button = Button(text="Close")
+        self.delete_technique_button.bind(on_press=self.stop)
+
         self.technique_buttons.add_widget(self.add_technique_button)
         self.technique_buttons.add_widget(self.delete_technique_button)
         self.layout.add_widget(self.technique_buttons)
@@ -97,13 +96,14 @@ class MainApp(App):
         confirm_button = Button(
             text='Ok',
             size_hint=(None, None),
-            size=(70, 70),
+            size=(100, 70),
             pos_hint={'center_x': 0.5}
         )
         confirm_button.bind(on_press=self.on_confirm)
 
         # Добавляем виджеты в макет
         self.date_buttons = BoxLayout(size_hint_y=None, height=70)
+        # self.date_buttons.add_widget(button_close)
         self.date_buttons.add_widget(self.day_spinner)
         self.date_buttons.add_widget(self.month_spinner)
         self.date_buttons.add_widget(self.year_spinner)
@@ -245,13 +245,14 @@ class MainApp(App):
             for note in self.notes[self.current_technique]:
                 note_layout = BoxLayout(size_hint_y=None, height=40)
                 note_label = Label(text=f"{note.date} {note.description} {note.start_time}-{note.end_time} ({note.work_time})")
-                edit_button = Button(text="Изм", size_hint_x=None, width=50)
+                edit_button = Button(text="Изм", size_hint_x=None, width=100)
                 edit_button.bind(on_press=lambda btn, n=note: self.edit_note(n))
-                delete_button = Button(text="X", size_hint_x=None, width=10)
+                delete_button = Button(text="X", size_hint_x=None, width=30)
                 delete_button.bind(on_press=lambda btn, n=note: self.delete_note(n))
+                note_layout.add_widget(delete_button)
                 note_layout.add_widget(note_label)
                 note_layout.add_widget(edit_button)
-                note_layout.add_widget(delete_button)
+
                 self.notes_layout.add_widget(note_layout)
                 total_time += note.work_time
             self.total_time_label.text = f"Общее время работы: {total_time.seconds // 3600:02}:{(total_time.seconds % 3600) // 60:02}"
