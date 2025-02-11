@@ -7,16 +7,15 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.popup import Popup
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
-# from kivy.uix.datepicker import DatePicker
 from datetime import datetime, timedelta
 import os
 
 class Note:
-    def __init__(self, date, start_time, end_time, description, work_time):
+    def __init__(self, date, description, start_time, end_time, work_time):
         self.date = date
+        self.description = description
         self.start_time = start_time
         self.end_time = end_time
-        self.description = description
         self.work_time = work_time
 
 class MainApp(App):
@@ -31,13 +30,24 @@ class MainApp(App):
         # Основной интерфейс
         self.layout = BoxLayout(orientation="vertical", padding=10, spacing=10)
 
+        # Кнопки закрытия и выбора техники
+        self.close_tech_buttons = BoxLayout(size_hint_y=None, height=100)
+        self.button_close = Button(text = "Close", height = 100)
+        self.button_close.bind(on_press=self.stop)
+        self.close_tech_buttons.add_widget(self.button_close)
+
         # Выбор техники
-        self.technique_spinner = Spinner(text="Выберите технику", values=self.techniques)
+        self.technique_spinner = Spinner(
+            text="Выберите технику",
+            size_hint=(1, None),  # 80% ширины родителя
+            height=100,  # Фиксированная высота 100px
+            values=self.techniques
+        )
         self.technique_spinner.bind(text=self.select_technique)
         self.layout.add_widget(self.technique_spinner)
 
         # Кнопки для управления техникой
-        self.technique_buttons = BoxLayout(size_hint_y=None, height=50)
+        self.technique_buttons = BoxLayout(size_hint_y=None, height=100)
         self.add_technique_button = Button(text="Добавить технику")
         self.add_technique_button.bind(on_press=self.add_technique)
         self.delete_technique_button = Button(text="Удалить технику")
@@ -47,7 +57,11 @@ class MainApp(App):
         self.layout.add_widget(self.technique_buttons)
 
         # Поле для описания
-        self.description_input = TextInput(hint_text="Описание", multiline=False)
+        self.description_input = TextInput(
+            size_hint=(1, None),  # 80% ширины родителя
+            height=50,  # Фиксированная высота 100px
+            hint_text="Введите описание"
+            )
         self.layout.add_widget(self.description_input)
 
         # Кнопки даты
@@ -57,7 +71,7 @@ class MainApp(App):
             text=self.selected_date[8:10], # Вставляем текущий день
             values=[str(i) for i in range(1, 32)],  # Дни от 1 до 31
             size_hint=(None, None),
-            size=(120, 30),
+            size=(100, 70),
             pos_hint={'center_x': 0.5}
         )
         self.selected_date.strip()
@@ -66,7 +80,7 @@ class MainApp(App):
             text=self.selected_date[5:7], # Вставляем текущий месяц
             values=[str(i) for i in range(1, 13)],  # Месяцы от 1 до 12
             size_hint=(None, None),
-            size=(120, 30),
+            size=(100, 70),
             pos_hint={'center_x': 0.5}
         )
 
@@ -75,32 +89,29 @@ class MainApp(App):
             text=self.selected_date[0:4], # Вставляем текущий год
             values=[str(i) for i in range(2020, 2100)],  # Годы от 2020 до 2099
             size_hint=(None, None),
-            size=(120, 30),
+            size=(100, 70),
             pos_hint={'center_x': 0.5}
         )
 
         # Кнопка для подтверждения выбора
         confirm_button = Button(
-            text='Подтвердить',
+            text='Ok',
             size_hint=(None, None),
-            size=(120, 30),
+            size=(70, 70),
             pos_hint={'center_x': 0.5}
         )
-
         confirm_button.bind(on_press=self.on_confirm)
 
         # Добавляем виджеты в макет
-        self.layout.add_widget(Label(size_hint=(None, None), size=(150, 44)))
-        self.layout.add_widget(self.day_spinner)
-        self.layout.add_widget(self.month_spinner)
-        self.layout.add_widget(self.year_spinner)
-        self.layout.add_widget(confirm_button)
-
-        self.selected_date = (f"{self.year_spinner.text}-{self.month_spinner.text}-{self.day_spinner.text}")
-        print(type(self.selected_date), self.selected_date)
+        self.date_buttons = BoxLayout(size_hint_y=None, height=70)
+        self.date_buttons.add_widget(self.day_spinner)
+        self.date_buttons.add_widget(self.month_spinner)
+        self.date_buttons.add_widget(self.year_spinner)
+        self.date_buttons.add_widget(confirm_button)
+        self.layout.add_widget(self.date_buttons)
 
         # Кнопки для времени
-        self.time_buttons = BoxLayout(size_hint_y=None, height=50)
+        self.time_buttons = BoxLayout(size_hint_y=None, height=100)
         self.start_button = Button(text="Начало")
         self.start_button.bind(on_press=self.record_start_time)
         self.end_button = Button(text="Окончание")
@@ -110,15 +121,15 @@ class MainApp(App):
         self.layout.add_widget(self.time_buttons)
 
         # Отображение времени начала и окончания
-        self.time_labels = BoxLayout(orientation="vertical", spacing=10)
-        self.start_time_label = Label(text="Время начала: --:--")
-        self.end_time_label = Label(text="Время окончания: --:--")
+        self.time_labels = BoxLayout(size_hint_y=None, height=70)
+        self.start_time_label = Label(text="--:--")
+        self.end_time_label = Label(text="--:--")
         self.time_labels.add_widget(self.start_time_label)
         self.time_labels.add_widget(self.end_time_label)
         self.layout.add_widget(self.time_labels)
 
         # Кнопка для добавления заметки
-        self.add_note_button = Button(text="Добавить заметку")
+        self.add_note_button = Button(text="Добавить заметку", size_hint_y=None, height=100)
         self.add_note_button.bind(on_press=self.add_note)
         self.layout.add_widget(self.add_note_button)
 
@@ -130,52 +141,22 @@ class MainApp(App):
         self.layout.add_widget(self.notes_scroll)
 
         # Общее время работы
-        self.total_time_label = Label(text="Общее время работы: 00:00")
+        self.total_time_label = Label(
+            text="Общее время работы: 00:00",
+            size_hint = (1, None),  # 100% ширины родителя
+            height = 50,  # Фиксированная высота 50px
+        )
         self.layout.add_widget(self.total_time_label)
 
         # Загрузка списка техники при запуске
         self.load_techniques()
 
         return self.layout
-# ***************************************************************************
-#     def show_date_picker(self, instance):
-#         """Отображение DatePicker для выбора даты."""
-#         content = BoxLayout(orientation="vertical", padding=10, spacing=10)
-#         date_picker = DatePicker(date=datetime.strptime(self.selected_date, "%Y-%m-%d"))
-#         save_button = Button(text="Выбрать")
-#         popup = Popup(title="Выберите дату", size_hint=(0.8, 0.8))
-#
-#         def save(instance):
-#             self.selected_date = date_picker.date.strftime("%Y-%m-%d")
-#             self.date_button.text = f"Выбрать дату: {self.selected_date}"
-#             popup.dismiss()
-
-        # save_button.bind(on_press=save)
-        # content.add_widget(date_picker)
-        # content.add_widget(save_button)
-        # popup.content = content
-        # popup.open()
-# *****************************************************************************
-
-
-        # # Добавляем виджеты в макет
-        # layout.add_widget(Label(text="Выберите дату:", size_hint=(None, None), size=(150, 44)))
-        # layout.add_widget(self.day_spinner)
-        # layout.add_widget(self.month_spinner)
-        # layout.add_widget(self.year_spinner)
-        # layout.add_widget(confirm_button)
-        #
-        # return layout
 
     def on_confirm(self, instance):
-        # Получаем выбранные значения
+        # Фиксируем дату
         self.selected_date = (f"{self.year_spinner.text}-{self.month_spinner.text}-{self.day_spinner.text}")
         print(type(self.selected_date), self.selected_date)
-        # day = self.day_spinner.text
-        # month = self.month_spinner.text
-        # year = self.year_spinner.text
-
-
 
     def select_technique(self, spinner, text):
         """Выбор техники."""
@@ -216,12 +197,12 @@ class MainApp(App):
     def record_start_time(self, instance):
         """Фиксация времени начала."""
         self.start_time = datetime.now().strftime("%H:%M")
-        self.start_time_label.text = f"Время начала: {self.start_time}"
+        self.start_time_label.text = f"{self.start_time}"
 
     def record_end_time(self, instance):
         """Фиксация времени окончания."""
         self.end_time = datetime.now().strftime("%H:%M")
-        self.end_time_label.text = f"Время окончания: {self.end_time}"
+        self.end_time_label.text = f"{self.end_time}"
 
     def add_note(self, instance):
         """Добавление заметки."""
@@ -231,7 +212,7 @@ class MainApp(App):
             end = datetime.strptime(self.end_time, "%H:%M")
             delta = end - start
             minutes = delta.seconds // 60
-            if delta.seconds % 60 != 0:
+            if delta.seconds % 60 != 0 or minutes == 0:
                 minutes += 1  # Округление в большую сторону
             work_time = timedelta(minutes=minutes)
 
@@ -253,8 +234,8 @@ class MainApp(App):
             self.start_time = None
             self.end_time = None
             self.description_input.text = ""
-            self.start_time_label.text = "Время начала: --:--"
-            self.end_time_label.text = "Время окончания: --:--"
+            self.start_time_label.text = "--:--"
+            self.end_time_label.text = "--:--"
 
     def update_notes(self):
         """Обновление списка заметок."""
@@ -263,10 +244,10 @@ class MainApp(App):
             total_time = timedelta()
             for note in self.notes[self.current_technique]:
                 note_layout = BoxLayout(size_hint_y=None, height=40)
-                note_label = Label(text=f"{note.date} {note.start_time}-{note.end_time} {note.description} (Время работы: {note.work_time})")
-                edit_button = Button(text="Изменить", size_hint_x=None, width=100)
+                note_label = Label(text=f"{note.date} {note.description} {note.start_time}-{note.end_time} ({note.work_time})")
+                edit_button = Button(text="Изм", size_hint_x=None, width=50)
                 edit_button.bind(on_press=lambda btn, n=note: self.edit_note(n))
-                delete_button = Button(text="Удалить", size_hint_x=None, width=100)
+                delete_button = Button(text="X", size_hint_x=None, width=10)
                 delete_button.bind(on_press=lambda btn, n=note: self.delete_note(n))
                 note_layout.add_widget(note_label)
                 note_layout.add_widget(edit_button)
@@ -311,7 +292,7 @@ class MainApp(App):
             filename = f"{self.current_technique}.txt"
             with open(filename, "w", encoding="utf-8") as file:
                 for note in self.notes[self.current_technique]:
-                    file.write(f"{note.date}|{note.start_time}|{note.end_time}|{note.description}|{note.work_time.seconds}\n")
+                    file.write(f"{note.date};{note.description};{note.start_time};{note.end_time};{note.work_time.seconds}\n")
 
     def load_notes(self):
         """Загрузка заметок из файла."""
@@ -321,7 +302,7 @@ class MainApp(App):
                 with open(filename, "r", encoding="utf-8") as file:
                     self.notes[technique] = []
                     for line in file:
-                        date, start_time, end_time, description, work_time_seconds = line.strip().split("|")
+                        date, start_time, end_time, description, work_time_seconds = line.strip().split(";")
                         work_time = timedelta(seconds=int(work_time_seconds))
                         self.notes[technique].append(Note(date, start_time, end_time, description, work_time))
 
