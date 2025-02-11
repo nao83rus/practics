@@ -245,7 +245,7 @@ class MainApp(App):
             for note in self.notes[self.current_technique]:
                 note_layout = BoxLayout(size_hint_y=None, height=40)
                 note_label = Label(text=f"{note.date} {note.description} {note.start_time}-{note.end_time} ({note.work_time})")
-                edit_button = Button(text="Изм", size_hint_x=None, width=100)
+                edit_button = Button(text="Изменить", size_hint_x=None, width=120)
                 edit_button.bind(on_press=lambda btn, n=note: self.edit_note(n))
                 delete_button = Button(text="X", size_hint_x=None, width=30)
                 delete_button.bind(on_press=lambda btn, n=note: self.delete_note(n))
